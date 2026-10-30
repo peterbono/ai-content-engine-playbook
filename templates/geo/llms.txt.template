@@ -1,0 +1,25 @@
+# Example Travel
+
+> One sentence that says what this site covers, for whom, and in which language. Write it like the answer you want an assistant to give about you.
+
+Two or three plain sentences on how the content is made: who writes it, what first-hand material it uses, how often prices and rules are checked. No marketing.
+
+## Guides
+
+- [Vietnam in two weeks: route and budget](https://example.com/vietnam-two-weeks/): one-line summary with the key number in it.
+- [Night bus or train from Hanoi to Hue](https://example.com/hanoi-hue-bus-or-train/): the short answer, in one line.
+
+## Tools
+
+- [Budget calculator](https://example.com/budget-calculator/): what it computes and from which data.
+
+## About
+
+- [How we work](https://example.com/method/): sources, update policy, who is behind the site.
+
+<!--
+Checklist before you publish this file:
+- Every description was read by a human (generated excerpts carry boilerplate and broken placeholders).
+- Every link returns 200 for an AI crawler user agent: curl -A "GPTBot" -I <url>
+- The file is served as text/plain at /llms.txt.
+-->

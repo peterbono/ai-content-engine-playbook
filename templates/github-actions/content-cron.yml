@@ -1,0 +1,70 @@
+# Daily content job: queue-driven, dry-run capable, never overlaps itself.
+# Copy to .github/workflows/content-cron.yml and adapt the "Run pipeline" step.
+# Pattern from module 01.
+
+name: Content pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (generate, do not publish)'
+        type: choice
+        options: ['1', '0']
+        default: '1'
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC daily. Comment out to pause; keep manual dispatch.
+
+permissions:
+  contents: write          # the job commits state (queue, cost ledger) back to the repo
+
+concurrency:
+  group: content-pipeline
+  cancel-in-progress: false  # wait for a running publish instead of killing it
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DRY_RUN: ${{ github.event.inputs.dry_run || '0' }}
+      # Secrets come from the repo settings only. Never hardcode a fallback value.
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      CMS_URL: ${{ secrets.CMS_URL }}
+      CMS_TOKEN: ${{ secrets.CMS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Pick the next due item
+        id: queue
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          ITEM=$(jq -c --arg today "$TODAY" \
+            '[.queue[] | select(.status == "pending" and .publish_date <= $today)][0] // empty' \
+            data/queue.json)
+          if [ -z "$ITEM" ]; then
+            echo "Nothing due today, skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "item=$ITEM" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run pipeline
+        if: steps.queue.outputs.skip != 'true'
+        run: node src/run-pipeline.mjs '${{ steps.queue.outputs.item }}'
+
+      - name: Commit state
+        if: steps.queue.outputs.skip != 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "chore(data): pipeline state $(date -u +%F)"
+          git push

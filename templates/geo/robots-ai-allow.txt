@@ -1,0 +1,65 @@
+# robots.txt: normal rules first, then an explicit allow block per AI crawler.
+# The 18 user agents below are the ones the FlashVoyage robots.txt allowed (archived 2026-10-25).
+# Check each vendor's documentation for current names before you ship.
+# IMPORTANT: your CDN may override this file or block these bots at the edge (see module 08).
+
+User-agent: *
+Disallow: /admin/
+Sitemap: https://example.com/sitemap.xml
+
+# --- AI access: explicitly allow AI/LLM crawlers ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: Timpibot
+Allow: /
+
+User-agent: Omgilibot
+Allow: /
+
+# --- end AI access ---
